@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Calculator;
 using Model.Calculator;
 using Persistent;
@@ -19,8 +20,14 @@ namespace View.Calculator
 		{
 			_model = new CalculatorWindowModel(this, new IntegerAdder(), new PrefsRepository());
 			_model.OnExpressionEvaluated += UpdateHistory;
-			
-			SetExpression(_model.LoadPersistent());
+
+			var lastHistory = new List<string>();
+			_model.LoadPersistent(out var expression, lastHistory);
+			for (var i = 0; i < lastHistory.Count; i++)
+			{
+				UpdateHistory(lastHistory[i]);
+			}
+			SetExpression(expression);
 		}
 
 		private void OnDestroy()

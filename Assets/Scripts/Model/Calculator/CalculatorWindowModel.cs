@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Calculator;
 using Persistent;
 using View.Calculator;
@@ -11,6 +12,9 @@ namespace Model.Calculator
 		private const string ERROR_LABEL = "ERROR";
 
 		private const string SAVED_EXPRESSION_KEY = "EXPRESSION";
+		private const string SAVED_HISTORY_KEY = "HISTORY";
+
+		private const string DELIMETER = "&";
 
 		public event Action<string> OnExpressionEvaluated;
 
@@ -37,11 +41,28 @@ namespace Model.Calculator
 		public void SavePersistent()
 		{
 			_repository.Save(SAVED_EXPRESSION_KEY, _view.Expression);
+
+			var sb = new StringBuilder();
+			for (var i = 0; i < _results.Count; i++)
+			{
+				sb.Append($"{_results[i]}{DELIMETER}");
+			}
+			_repository.Save(SAVED_HISTORY_KEY, sb.ToString());
 		}
 
-		public string LoadPersistent()
+		public void LoadPersistent(out string expression, List<string> history)
 		{
-			return _repository.Get(SAVED_EXPRESSION_KEY);
+			expression = _repository.Get(SAVED_EXPRESSION_KEY);
+			var savedHistory = _repository.Get(SAVED_HISTORY_KEY);
+			var results = savedHistory.Split(DELIMETER);
+			for (var i = 0; i < results.Length; i++)
+			{
+				if(String.IsNullOrEmpty(results[i]) || string.IsNullOrWhiteSpace(results[i]))
+					continue;
+				
+				_results.Add(results[i]);
+				history.Add(results[i]);
+			}
 		}
 		
 		private void ProceedResult(string expression, string value)
