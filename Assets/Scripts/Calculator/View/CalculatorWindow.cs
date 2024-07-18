@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using Calculator;
-using Model.Calculator;
+using Calculator.Model;
 using Persistent;
 using TMPro;
 using UnityEngine;
 
-namespace View.Calculator
+namespace Calculator.View
 {
 	public class CalculatorWindow : MonoBehaviour
 	{

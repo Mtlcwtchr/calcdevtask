@@ -1,4 +1,4 @@
-namespace Model
+namespace Core
 {
 	public interface IModel
 	{

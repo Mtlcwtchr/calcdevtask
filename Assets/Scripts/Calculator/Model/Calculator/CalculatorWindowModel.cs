@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Calculator;
+using Calculator.View;
+using Core;
+using Managers.UI;
+using Model.Popups;
 using Persistent;
-using View.Calculator;
+using Popups.Message;
 
-namespace Model.Calculator
+namespace Calculator.Model
 {
 	public class CalculatorWindowModel : IModel
 	{
@@ -15,6 +18,8 @@ namespace Model.Calculator
 		private const string SAVED_HISTORY_KEY = "HISTORY";
 
 		private const string DELIMETER = "&";
+
+		private const string ERROR_MESSAGE = "Please check the expression you just entered";
 
 		public event Action<string> OnExpressionEvaluated;
 
@@ -34,8 +39,9 @@ namespace Model.Calculator
 
 		public void EvaluateExpression(string expression)
 		{
-			var res = _calculator.TryEvaluate(expression, out var result) ? result.ToString() : ERROR_LABEL;
-			ProceedResult(expression, res);
+			var isCompleted = _calculator.TryEvaluate(expression, out var result);
+			var res = isCompleted ? result.ToString() : ERROR_LABEL;
+			ProceedResult(expression, res, isCompleted);
 		}
 
 		public void SavePersistent()
@@ -65,10 +71,15 @@ namespace Model.Calculator
 			}
 		}
 		
-		private void ProceedResult(string expression, string value)
+		private void ProceedResult(string expression, string value, bool isCompleted)
 		{
 			var result = $"{expression}={value}";
 			SaveResult(result);
+			
+			if (!isCompleted)
+			{
+				PopupManager.Instance.Create(EPopup.ExpressionError, new TextPopupSettings(ERROR_MESSAGE));
+			}
 		}
 
 		private void SaveResult(string result)

@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace View.Calculator
+namespace Calculator.View
 {
 	public class HistoryScroll : MonoBehaviour
 	{
